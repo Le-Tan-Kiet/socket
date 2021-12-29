@@ -4,7 +4,7 @@ from tkinter import *
 from tkinter.ttk import *
 from validation import *
 
-# Start handle data received
+# Start handle data client
 
 
 def sendList(list):
@@ -15,128 +15,23 @@ def sendList(list):
     client.sendall(END_MSG.encode(FORMAT))
 
 
-def sendAccount(username, password):
-    client.sendall(SIGNUP.encode(FORMAT))
-    client.recv(BUFFSIZE).decode(FORMAT)
-    client.sendall(username.encode(FORMAT))
-    client.recv(BUFFSIZE).decode(FORMAT)
-    client.sendall(password.encode(FORMAT))
-    client.recv(BUFFSIZE).decode(FORMAT)
-
-
-def sendSignupAccount():  # Send account to server
-    # Input username
-    username = input('Enter username: ')
-    client.sendall(username.encode(FORMAT))
-    is_valid_username = client.recv(BUFFSIZE).decode(FORMAT)
-    while is_valid_username == '0':
-        print('Invalid username! Please enter username again.')
-        username = input('Enter username: ')
-        client.sendall(username.encode(FORMAT))
-        is_valid_username = client.recv(BUFFSIZE).decode(FORMAT)
-
-    # Input password
-    password = input('Enter password: ')
-    client.sendall(password.encode(FORMAT))
-    is_valid_password = client.recv(BUFFSIZE).decode(FORMAT)
-    while is_valid_password == '0':
-        print('Invalid password! Please enter password again.')
-        password = input('Enter password: ')
-        client.sendall(password.encode(FORMAT))
-        is_valid_password = client.recv(BUFFSIZE).decode(FORMAT)
-
-    # Input confirm password
-    pass_conf = input('Enter confirm password: ')
-    client.sendall(pass_conf.encode(FORMAT))
-    is_valid_pass_conf = client.recv(BUFFSIZE).decode(FORMAT)
-    while is_valid_pass_conf == '0':
-        print('Password not match! Please enter confirm password again.')
-        pass_conf = input('Enter confirm password: ')
-        client.sendall(pass_conf.encode(FORMAT))
-        is_valid_pass_conf = client.recv(BUFFSIZE).decode(FORMAT)
-
-    print('Sign in successfully')
-
-
-def sendLoginAccount():
-    username = input('Enter username: ')
-    client.sendall(username.encode(FORMAT))
-    client.recv(BUFFSIZE).decode(FORMAT)
-    password = input('Enter password: ')
-    client.sendall(password.encode(FORMAT))
-    is_validate_account = client.recv(BUFFSIZE).decode(FORMAT)
-    while is_validate_account == '0':
-        print('Username or password is not correct. Please login again')
-        username = input('Enter username: ')
-        client.sendall(username.encode(FORMAT))
-        client.recv(BUFFSIZE).decode(FORMAT)
-        password = input('Enter password: ')
-        client.sendall(password.encode(FORMAT))
-        is_validate_account = client.recv(BUFFSIZE).decode(FORMAT)
-
-    print('Login successfully')
-
-
-# def sendRequest():
-    bank = input('Enter bank: ')
-    client.sendall(bank.encode(FORMAT))
-    client.recv(BUFFSIZE).decode(FORMAT)
-    currency_type = input('Enter currency_type: ')
-    client.sendall(currency_type.encode(FORMAT))
-    is_validate_request = client.recv(BUFFSIZE).decode(FORMAT)
-    while is_validate_request == '0':
-        print('Bank or currency_type is not correct. Please login again')
-        bank = input('Enter bank: ')
-        client.sendall(bank.encode(FORMAT))
-        client.recv(BUFFSIZE).decode(FORMAT)
-        currency_type = input('Enter currency_type: ')
-        client.sendall(currency_type.encode(FORMAT))
-        is_validate_request = client.recv(BUFFSIZE).decode(FORMAT)
-
-    client.sendall(is_validate_request.encode(FORMAT))
-
-
 def receiveResponse():
     response = client.recv(BUFFSIZE).decode(FORMAT)
     return response
 
-
-def sendMessage():
-    print('Client address: ', client.getsockname())
-
-    while True:
-        msg = input('Client: ')
-        try:
-            client.sendall(msg.encode(FORMAT))
-        except:
-            break
-
-        if msg == CLOSE:
-            break
-
-        if msg == SIGNUP:
-            sendSignupAccount()
-            continue
-
-        if msg == LOGIN:
-            sendLoginAccount()
-            continue
-
-        if msg == 'list':
-            list = ['kietle', '123']
-            sendAccount(list)
-            continue
-
-        if msg == REQUEST:
-            sendRequest()
-            # Response
-            response = receiveResponse()
-            print('Response: ', response)
-            continue
-    client.close()
-# End handle data received
+# End handle data client
 
 # Start GUI
+
+
+def changeFrameFromStartupToSignup(ip, port, alert_lbl):
+    try:
+        client.connect((ip, int(port)))
+        startup_frame.destroy()
+        signup_frame.pack(fill="both", expand=True)
+    except:
+        print('1')
+        alert_lbl.configure(text='IP hoac port khong dung')
 
 
 def changeFrameFromSignupToSearch(client_gui, username, password, pass_conf, alert_lbl):
@@ -293,6 +188,29 @@ def signUp(client_gui):
            command=lambda: changeFrameFromSignupToLogin(client_gui)).pack()
     return frame
 
+
+def startUp(client_gui):
+    frame = Frame(client_gui)
+
+    # HOST
+    Label(frame, text="Enter IP: ").pack()
+    ip = Entry(frame, width=20)
+    ip.pack()
+
+    # PORT
+    Label(frame, text="Enter PORT: ").pack()
+    port = Entry(frame, width=20)
+    port.pack()
+
+    # Alert when validation not successfully
+    alert_lbl = Label(frame, text="", foreground='red')
+    alert_lbl.pack()
+
+    # Sign Up button
+    Button(frame, text="Start",
+           command=lambda: changeFrameFromStartupToSignup(ip.get(), port.get(), alert_lbl)).pack()
+
+    return frame
 # End GUI
 
 # ----------------- main -------------------
@@ -307,16 +225,17 @@ def signUp(client_gui):
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 try:
-    client.connect((HOST, PORT))
+    # client.connect((HOST, PORT))
 
     client_gui = Tk()
     client_gui.title("Client")
     client_gui.geometry("300x200")
 
+    startup_frame = startUp(client_gui)
     signup_frame = signUp(client_gui)
     login_frame = login(client_gui)
     search_frame = search(client_gui)
-    signup_frame.pack(fill="both", expand=True)
+    startup_frame.pack(fill="both", expand=True)
 
     client_gui.mainloop()
 

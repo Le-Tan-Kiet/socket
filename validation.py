@@ -16,7 +16,7 @@ account = [
 
 
 def validateSignupUsername(username):
-    if username == '':
+    if username == "":
         return False
     for user in account:
         if(user[0] == username):
@@ -25,7 +25,7 @@ def validateSignupUsername(username):
 
 
 def validateSignupPassword(password):
-    if password == '':
+    if password == "":
         return False
     if len(password) < 6:
         return False
@@ -33,7 +33,7 @@ def validateSignupPassword(password):
 
 
 def validateSignupConfirmPassword(password, pass_conf):
-    if pass_conf == '':
+    if pass_conf == "":
         return False
     if pass_conf == password:
         return True
@@ -54,3 +54,9 @@ def validateResquest(bank, currency_type):
     if currency_type not in ['AUD', 'CAD', 'CHF', 'EUR', 'GBP', 'JPY', 'USD']:
         return False
     return True
+
+
+def validateStartUp(ip, port):
+    if(ip == HOST and port == PORT):
+        return True
+    return False

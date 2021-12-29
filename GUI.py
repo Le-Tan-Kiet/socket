@@ -1,26 +1,45 @@
-from tkinter import *
-from tkinter.ttk import *
+from client import *
 
 
-def changeFrameFromSignupToSearch(client, recv_username, recv_password, pass_conf, alert_lbl):
-    # Validate before change frame
-    if(validateUsername(recv_username) == False):
+# Start GUI client
+
+
+def changeFrameFromSignupToSearch(client_gui, username, password, pass_conf, alert_lbl):
+    client.sendall(SIGNUP.encode(FORMAT))
+    list = [username, password, pass_conf]
+    sendList(list)
+
+    # Input username
+    is_valid_username = client.recv(BUFFSIZE).decode(FORMAT)
+    if(is_valid_username == FAIL):
         alert_lbl.configure(text='Ten tai khoan khong hop le')
         return
-    elif(validatePassword(recv_password) == False):
+    client.sendall(EMPTY_MSG.encode(FORMAT))
+    # Input password
+
+    is_valid_password = client.recv(BUFFSIZE).decode(FORMAT)
+    if(is_valid_password == FAIL):
         alert_lbl.configure(text='Mat khau phai co it nhat 6 ki tu')
         return
-    elif(validatePasswordConfirm(recv_password, pass_conf) == False):
+    client.sendall(EMPTY_MSG.encode(FORMAT))
+    # Input confirm password
+    is_valid_pass_conf = client.recv(BUFFSIZE).decode(FORMAT)
+    if(is_valid_pass_conf == FAIL):
         alert_lbl.configure(text='Mat khau khong khop')
         return
+    client.sendall(EMPTY_MSG.encode(FORMAT))
 
-    # Delete current frame and add a new frame
     signup_frame.destroy()
     search_frame.pack(fill="both", expand=True)
 
 
-def changeFrameFromLoginToSearch(client, recv_username, recv_password, alert_lbl):
-    if validateLoginAccount(recv_username, recv_password) == False:
+def changeFrameFromLoginToSearch(client_gui, username, password, alert_lbl):
+    client.sendall(LOGIN.encode(FORMAT))
+    account = [username, password]
+    sendList(account)
+
+    is_valid_account = client.recv(BUFFSIZE).decode(FORMAT)
+    if is_valid_account == FAIL:
         alert_lbl.configure(text='Tai khoan khong hop le')
         return
 
@@ -29,31 +48,34 @@ def changeFrameFromLoginToSearch(client, recv_username, recv_password, alert_lbl
     search_frame.pack(fill="both", expand=True)
 
 
-def changeFrameFromSignupToLogin(client):
+def changeFrameFromSignupToLogin(client_gui):
     # Delete current frame and add a new frame
     signup_frame.destroy()
     login_frame.pack(fill="both", expand=True)
 
 
-def outputResult(entry_result, type_currency, bank):
+def outputResult(entry_result, result):
     # Delete old value in result entry
     entry_result.delete(0, 15)
     # Insert new value in result entry
-    entry_result.insert(0, getCurrency(type_currency, bank))
+    entry_result.insert(0, result)
 
 
-def endClient():
-    client.destroy()
+def handleRequestClient(entry_result, bank, currency_type):
+    client.sendall(REQUEST.encode(FORMAT))
+    request = [bank, currency_type]
+    sendList(request)
+
+    result = receiveResponse()
+    outputResult(entry_result, result)
 
 
-def search(client):
-    frame = Frame(client)
-    # Types of currency to search
-    Label(frame, text='Currency').pack()
-    currency = Combobox(frame)
-    currency["value"] = ('AUD', 'CAD', 'CHF', 'EUR', 'GBP', 'JPY', 'USD')
-    currency.current(0)
-    currency.pack()
+def endClient(client_gui):
+    client_gui.destroy()
+
+
+def search(client_gui):
+    frame = Frame(client_gui)
 
     # Types of bank to search
     Label(frame, text='Bank').pack()
@@ -63,23 +85,30 @@ def search(client):
     bank.current(0)
     bank.pack()
 
+    # Types of currency to search
+    Label(frame, text='Currency').pack()
+    currency = Combobox(frame)
+    currency["value"] = ('AUD', 'CAD', 'CHF', 'EUR', 'GBP', 'JPY', 'USD')
+    currency.current(0)
+    currency.pack()
+
     # Result of search
     Label(frame, text="Result: ").pack()
     entry_result = Entry(frame, width=20)
     btn = Button(frame, text="Search",
-                 command=lambda: outputResult(entry_result, currency.get(), bank.get()))
+                 command=lambda: handleRequestClient(entry_result, bank.get(), currency.get()))
     btn.pack()
     entry_result.pack()
-    entry_result.configure(text=currency.get())
+    # entry_result.configure(text=currency.get())
 
     # Exit button
-    Button(frame, text="Exit", command=lambda: endClient(client)).pack()
+    Button(frame, text="Exit", command=lambda: endClient(client_gui)).pack()
 
     return frame
 
 
-def login(client):
-    frame = Frame(client)
+def login(client_gui):
+    frame = Frame(client_gui)
     # Username
     Label(frame, text="Username").pack()
     entry_username = Entry(frame, width=20)
@@ -96,13 +125,13 @@ def login(client):
 
     # Login button
     Button(frame, text="Login",
-           command=lambda: changeFrameFromLoginToSearch(client, entry_username.get(), entry_password.get(), alert_lbl)).pack()
+           command=lambda: changeFrameFromLoginToSearch(client_gui, entry_username.get(), entry_password.get(), alert_lbl)).pack()
 
     return frame
 
 
-def signUp(client):
-    frame = Frame(client)
+def signUp(client_gui):
+    frame = Frame(client_gui)
     # Username
     Label(frame, text="Username").pack()
     entry_username = Entry(frame, width=20)
@@ -124,22 +153,9 @@ def signUp(client):
 
     # Sign Up button
     Button(frame, text="Sign Up",
-           command=lambda: changeFrameFromSignupToSearch(client, entry_username.get(), entry_password.get(), entry_pass_conf.get(), alert_lbl)).pack()
+           command=lambda: changeFrameFromSignupToSearch(client_gui, entry_username.get(), entry_password.get(), entry_pass_conf.get(), alert_lbl)).pack()
     Button(frame, text="Da co tai khoan",
-           command=lambda: changeFrameFromSignupToLogin(client)).pack()
+           command=lambda: changeFrameFromSignupToLogin(client_gui)).pack()
     return frame
-# End GUI
 
-
-# ----------------- main ------------------
-client = Tk()
-
-client.title("Client")
-client.geometry("300x200")
-
-signup_frame = signUp(client)
-login_frame = login(client)
-search_frame = search(client)
-signup_frame.pack(fill="both", expand=True)
-
-client.mainloop()
+# End GUI client
