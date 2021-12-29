@@ -42,7 +42,7 @@ def validateSignupConfirmPassword(password, pass_conf):
 
 def validateLoginAccount(username, password):
     for user in account:
-        if (user[0] == username) and (user[1] == password):
+        if (username == user[0]) and (password == user[1]):
             return True
 
     return False

@@ -8,3 +8,11 @@ LOGIN = 'login'
 SIGNUP = 'signup'
 REQUEST = 'request'
 CLOSE = 'close'
+
+SUCCESS = 'success'
+FAIL = 'fail'
+
+END_MSG = 'end'
+EMPTY_MSG = 'empty'
+
+ISEMPTYDATA = True

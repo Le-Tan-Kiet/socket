@@ -1,86 +1,74 @@
 import socket
 from constant import *
 from validation import *
-# from requestAPI import getCurrency
 import requestAPI as res
 from threading import Thread
 
 
 def receiveList(conn):
     list = []
-    end_msg = 'end'
 
     item = conn.recv(BUFFSIZE).decode(FORMAT)
-    while item != end_msg:
+    while item != END_MSG:
         list.append(item)
-        conn.sendall(item.encode())
+        conn.sendall(EMPTY_MSG.encode(FORMAT))
         item = conn.recv(BUFFSIZE).decode(FORMAT)
 
     return list
 
 
 def receiveSignupAccount(conn):  # Receive account from client and return account
-    account = []  # Init a list to contain username and password
+    list = receiveList(conn)
 
     # Receive username, validate then add to list
-    username = conn.recv(BUFFSIZE).decode(FORMAT)
-    while validateSignupUsername(username) == False:
-        conn.sendall('0'.encode(FORMAT))
-        username = conn.recv(BUFFSIZE).decode(FORMAT)
-    conn.sendall('1'.encode(FORMAT))
-    account.append(username)
+    if validateSignupUsername(list[0]) == True:
+        conn.sendall(SUCCESS.encode(FORMAT))
+    else:
+        conn.sendall(FAIL.encode(FORMAT))
+        return []
+    conn.recv(BUFFSIZE).decode(FORMAT)
     # Receive password, validate then add to list
-    password = conn.recv(BUFFSIZE).decode(FORMAT)
-    while validateSignupPassword(password) == False:
-        conn.sendall('0'.encode(FORMAT))
-        password = conn.recv(BUFFSIZE).decode(FORMAT)
-    conn.sendall('1'.encode(FORMAT))
-    account.append(password)
+    if validateSignupPassword(list[1]) == True:
+        conn.sendall(SUCCESS.encode(FORMAT))
+    else:
+        conn.sendall(FAIL.encode(FORMAT))
+        return []
+    conn.recv(BUFFSIZE).decode(FORMAT)
     # Receive confirm password then validate
-    pass_conf = conn.recv(BUFFSIZE).decode(FORMAT)
-    while validateSignupConfirmPassword(password, pass_conf) == False:
-        conn.sendall('0'.encode(FORMAT))
-        pass_conf = conn.recv(BUFFSIZE).decode(FORMAT)
-    conn.sendall('1'.encode(FORMAT))
+    if validateSignupConfirmPassword(list[1], list[2]) == True:
+        conn.sendall(SUCCESS.encode(FORMAT))
+    else:
+        conn.sendall(FAIL.encode(FORMAT))
+        return []
+    conn.recv(BUFFSIZE).decode(FORMAT)
+    account = []  # Init a list to contain username and password
+    account.append(list[0])
+    account.append(list[1])
 
     return account
 
 
 def receiveLoginAccount(conn):
-    account = []
+    account = receiveList(conn)
 
-    username = conn.recv(BUFFSIZE).decode(FORMAT)
-    conn.sendall(username.encode(FORMAT))
-    password = conn.recv(BUFFSIZE).decode(FORMAT)
-    while validateLoginAccount(username, password) == False:
-        conn.sendall('0'.encode(FORMAT))
-        username = conn.recv(BUFFSIZE).decode(FORMAT)
-        conn.sendall(username.encode(FORMAT))
-        password = conn.recv(BUFFSIZE).decode(FORMAT)
-    conn.sendall('1'.encode(FORMAT))
-    account.append(username)
-    account.append(password)
+    if validateLoginAccount(account[0], account[1]) == False:
+        conn.sendall(FAIL.encode(FORMAT))
+        return []
+    conn.sendall(SUCCESS.encode(FORMAT))
 
     return account
 
 
 def receiveRequest(conn):
-    request = []
-
-    bank = conn.recv(BUFFSIZE).decode(FORMAT)
-    conn.sendall(bank.encode(FORMAT))
-    currency_type = conn.recv(BUFFSIZE).decode(FORMAT)
-    while validateResquest(bank, currency_type) == False:
-        conn.sendall('0'.encode(FORMAT))
-        bank = conn.recv(BUFFSIZE).decode(FORMAT)
-        conn.sendall(bank.encode(FORMAT))
-        currency_type = conn.recv(BUFFSIZE).decode(FORMAT)
-    conn.sendall('1'.encode(FORMAT))
-    a = conn.recv(BUFFSIZE).decode(FORMAT)
-    request.append(bank)
-    request.append(currency_type)
+    request = receiveList(conn)
 
     return request
+
+
+def handleRequestServer(conn):
+    request = receiveList(conn)
+    response = str(res.getCurrency(request[0], request[1]))
+    conn.sendall(response.encode(FORMAT))
 
 
 def sendResponse(conn, request):
@@ -102,6 +90,7 @@ def receiveMessage(conn, addr):
             break
 
         if msg == SIGNUP:
+            # conn.sendall(EMPTY_MSG.encode(FORMAT))
             account = receiveSignupAccount(conn)
             print('Sign Up Account: ', account)
             continue
@@ -112,15 +101,12 @@ def receiveMessage(conn, addr):
             continue
 
         if msg == 'list':
-            list = receiveList(conn)
+            list = receiveAccount(conn)
             print('List: ', list)
             continue
 
         if msg == REQUEST:
-            request = receiveRequest(conn)
-            print('Request: ', request)
-            # Response
-            sendResponse(conn, request)
+            handleRequestServer(conn)
             continue
 
         print(f'Client {addr} says {msg}')
@@ -135,6 +121,7 @@ server.listen()
 
 print('Server: ', HOST, PORT)
 print('Waiting for client...')
+res.updateData()
 
 while True:
     try:
