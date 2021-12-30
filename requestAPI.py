@@ -1,8 +1,10 @@
 import requests
 import json
+from constant import *
 from threading import Timer
+import datetime
 
-data = []
+data = {}
 
 
 def getBankId(bank):  # Get bank name by bank ID
@@ -36,42 +38,47 @@ def getData():
         'https://vapi.vnappmob.com/api/request_api_key?scope=exchange_rate&fbclid=IwAR1LiVpNea58gxXeGZgPX6QWRRJQpkFfS_r41PJRsuy2z7-1uurKflwhGWo')
     token = json.loads(api_key.content)["results"]
 
-    bank_list = ['Vietcombank', 'Vietinbank',
-                 'Techcombank', 'BIDV', 'Sacombank', 'SBV']
     for item in bank_list:
-        data.append(getBankData(item, token))
+        data[item] = getBankData(item, token)
 
     return data
 
 
 def updateData():
     data = getData()
+    global DATETIME
+    DATETIME = str(datetime.datetime.now())
     Timer(1800, updateData).start()
 
 
+def getCurrencyBank(bank, type_currency):
+    list = []
+    for item in data[bank]:
+        if item["currency"] == type_currency:
+            list.append(bank)
+            list.append(item["currency"])
+            list.append(item["sell"])
+    return list
+
+
 def getCurrency(bank, type_currency):  # Get sell currency
-    # Find currency transform
-    if bank == 'Vietcombank':
-        for x in data[0]:
-            if x["currency"] == type_currency:
-                return x["sell"]
-    elif bank == 'Vietinbank':
-        for x in data[1]:
-            if x["currency"] == type_currency:
-                return x["sell"]
-    elif bank == 'Techcombank':
-        for x in data[2]:
-            if x["currency"] == type_currency:
-                return x["sell"]
-    elif bank == 'BIDV':
-        for x in data[3]:
-            if x["currency"] == type_currency:
-                return x["sell"]
-    elif bank == 'Sacombank':
-        for x in data[4]:
-            if x["currency"] == type_currency:
-                return x["sell"]
-    elif bank == 'SBV':
-        for x in data[5]:
-            if x["currency"] == type_currency:
-                return x["sell"]
+    # Find currency
+    list = []
+    if bank == "All" and type_currency == "All":
+        for i in bank_list:
+            for j in type_currency_list:
+                list_item = getCurrencyBank(i, j)
+                list.append(list_item)
+    elif bank == "All":
+        for i in bank_list:
+            list_item = getCurrencyBank(i, type_currency)
+            list.append(list_item)
+    elif type_currency == "All":
+        for j in type_currency_list:
+            list_item = getCurrencyBank(bank, j)
+            list.append(list_item)
+    else:
+        list_item = getCurrencyBank(bank, type_currency)
+        list.append(list_item)
+
+    return list

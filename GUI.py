@@ -1,161 +1,294 @@
-from client import *
+from tkinter import *
+from tkinter import ttk
 
 
-# Start GUI client
+def SignUpPage(app):
+    frame = Frame(app)
+    canvas = Canvas(
+        frame,
+        bg="#ffffff",
+        height=600,
+        width=1000,
+        bd=0,
+        highlightthickness=0,
+        relief="ridge")
+    canvas.place(x=0, y=0)
+    # Background
+    canvas.background0_img = PhotoImage(file=f"LogSignImg/background0.png")
+    canvas.create_image(
+        0, 0, anchor=NW,
+        image=canvas.background0_img)
+    # username
+    canvas.entrySigUpUser_img = PhotoImage(file=f"LogSignImg/img_textBox0.png")
+    canvas.create_image(
+        600, 211, anchor=NW,
+        image=canvas.entrySigUpUser_img)
+    entrySignUpUser = Entry(frame,
+                            bd=0,
+                            bg="#dfdfdf",
+                            highlightthickness=0)
 
-
-def changeFrameFromSignupToSearch(client_gui, username, password, pass_conf, alert_lbl):
-    client.sendall(SIGNUP.encode(FORMAT))
-    list = [username, password, pass_conf]
-    sendList(list)
-
-    # Input username
-    is_valid_username = client.recv(BUFFSIZE).decode(FORMAT)
-    if(is_valid_username == FAIL):
-        alert_lbl.configure(text='Ten tai khoan khong hop le')
-        return
-    client.sendall(EMPTY_MSG.encode(FORMAT))
-    # Input password
-
-    is_valid_password = client.recv(BUFFSIZE).decode(FORMAT)
-    if(is_valid_password == FAIL):
-        alert_lbl.configure(text='Mat khau phai co it nhat 6 ki tu')
-        return
-    client.sendall(EMPTY_MSG.encode(FORMAT))
-    # Input confirm password
-    is_valid_pass_conf = client.recv(BUFFSIZE).decode(FORMAT)
-    if(is_valid_pass_conf == FAIL):
-        alert_lbl.configure(text='Mat khau khong khop')
-        return
-    client.sendall(EMPTY_MSG.encode(FORMAT))
-
-    signup_frame.destroy()
-    search_frame.pack(fill="both", expand=True)
-
-
-def changeFrameFromLoginToSearch(client_gui, username, password, alert_lbl):
-    client.sendall(LOGIN.encode(FORMAT))
-    account = [username, password]
-    sendList(account)
-
-    is_valid_account = client.recv(BUFFSIZE).decode(FORMAT)
-    if is_valid_account == FAIL:
-        alert_lbl.configure(text='Tai khoan khong hop le')
-        return
-
-    # Delete current frame and add a new frame
-    login_frame.destroy()
-    search_frame.pack(fill="both", expand=True)
-
-
-def changeFrameFromSignupToLogin(client_gui):
-    # Delete current frame and add a new frame
-    signup_frame.destroy()
-    login_frame.pack(fill="both", expand=True)
-
-
-def outputResult(entry_result, result):
-    # Delete old value in result entry
-    entry_result.delete(0, 15)
-    # Insert new value in result entry
-    entry_result.insert(0, result)
-
-
-def handleRequestClient(entry_result, bank, currency_type):
-    client.sendall(REQUEST.encode(FORMAT))
-    request = [bank, currency_type]
-    sendList(request)
-
-    result = receiveResponse()
-    outputResult(entry_result, result)
-
-
-def endClient(client_gui):
-    client_gui.destroy()
-
-
-def search(client_gui):
-    frame = Frame(client_gui)
-
-    # Types of bank to search
-    Label(frame, text='Bank').pack()
-    bank = Combobox(frame)
-    bank["value"] = ('Vietcombank', 'Vietinbank',
-                     'Techcombank', 'BIDV', 'Sacombank', 'SBV')
-    bank.current(0)
-    bank.pack()
-
-    # Types of currency to search
-    Label(frame, text='Currency').pack()
-    currency = Combobox(frame)
-    currency["value"] = ('AUD', 'CAD', 'CHF', 'EUR', 'GBP', 'JPY', 'USD')
-    currency.current(0)
-    currency.pack()
-
-    # Result of search
-    Label(frame, text="Result: ").pack()
-    entry_result = Entry(frame, width=20)
-    btn = Button(frame, text="Search",
-                 command=lambda: handleRequestClient(entry_result, bank.get(), currency.get()))
-    btn.pack()
-    entry_result.pack()
-    # entry_result.configure(text=currency.get())
-
-    # Exit button
-    Button(frame, text="Exit", command=lambda: endClient(client_gui)).pack()
-
-    return frame
-
-
-def login(client_gui):
-    frame = Frame(client_gui)
-    # Username
-    Label(frame, text="Username").pack()
-    entry_username = Entry(frame, width=20)
-    entry_username.pack()
-
+    entrySignUpUser.place(
+        x=620, y=211,
+        width=255.0,
+        height=43)
     # Password
-    Label(frame, text="Password").pack()
-    entry_password = Entry(frame, width=20)
-    entry_password.pack()
+    canvas.entrySignUpPass_img = PhotoImage(
+        file=f"LogSignImg/img_textBox0.png")
+    canvas.create_image(600, 319, anchor=NW, image=canvas.entrySignUpPass_img)
 
-    # Alert when validation not successfully
-    alert_lbl = Label(frame, text="", foreground='red')
-    alert_lbl.pack()
+    entrySignUpPass = Entry(frame,
+                            bd=0, show="*",
+                            bg="#dfdfdf",
+                            highlightthickness=0)
 
-    # Login button
-    Button(frame, text="Login",
-           command=lambda: changeFrameFromLoginToSearch(client_gui, entry_username.get(), entry_password.get(), alert_lbl)).pack()
+    entrySignUpPass.place(
+        x=620, y=319,
+        width=255.0,
+        height=43)
+    # Confirm Password
+    canvas.entryCFSignUPPass_img = PhotoImage(
+        file=f"LogSignImg/img_textBox0.png")
+    canvas.create_image(
+        600, 427, anchor=NW,
+        image=canvas.entryCFSignUPPass_img)
 
+    entryCFSignUPPass = Entry(frame,
+                              bd=0, show="*",
+                              bg="#dfdfdf",
+                              highlightthickness=0)
+
+    entryCFSignUPPass.place(
+        x=620, y=427,
+        width=255.0,
+        height=43)
+    # Notice
+    LabelSignUp = Label(frame,  text="", background="red")
+    LabelSignUp.place(x=600, y=141, width=300, height=25)
+
+    # Sign Up Button
+    canvas.btnSignup_img = PhotoImage(file=f"LogSignImg/signup0.png")
+    btnSignUp = Button(frame, image=canvas.btnSignup_img, bd=0,
+                       bg="white", command=lambda: changeFrameFromSignupToSearch(app, SearchPage, entrySignUpUser.get(), entrySignUpPass.get(), entryCFSignUPPass.get(), LabelSignUp))
+
+    btnSignUp.place(
+        x=690, y=497, anchor=NW,
+        width=120,
+        height=50)
     return frame
 
 
-def signUp(client_gui):
-    frame = Frame(client_gui)
-    # Username
-    Label(frame, text="Username").pack()
-    entry_username = Entry(frame, width=20)
-    entry_username.pack()
+def LoginPage(app):
+    frame = Frame(app)
+    canvas = Canvas(
+        frame,
+        bg="#ffffff",
+        height=600,
+        width=1000,
+        bd=0,
+        highlightthickness=0,
+        relief="ridge")
+    canvas.place(x=0, y=0)
+    # Background
+    canvas.background1_img = PhotoImage(file=f"LogSignImg/background1.png")
+    canvas.create_image(
+        0, 0, anchor=NW,
+        image=canvas.background1_img)
+    # username
+    canvas.entryUser_img = PhotoImage(file=f"LogSignImg/img_textBox0.png")
+    canvas.create_image(
+        600, 211, anchor=NW,
+        image=canvas.entryUser_img)
 
+    entryUser = Entry(frame,
+                      bd=0,
+                      bg="#dfdfdf",
+                      highlightthickness=0)
+
+    entryUser.place(
+        x=620, y=211,
+        width=255.0,
+        height=43)
     # Password
-    Label(frame, text="Password").pack()
-    entry_password = Entry(frame, width=20)
-    entry_password.pack()
+    canvas.entryPass_img = PhotoImage(file=f"LogSignImg/img_textBox0.png")
+    canvas.create_image(600, 319, anchor=NW, image=canvas.entryPass_img)
 
-    # Password confirm
-    Label(frame, text="Password confirm").pack()
-    entry_pass_conf = Entry(frame, width=20)
-    entry_pass_conf.pack()
+    entryPass = Entry(frame,
+                      bd=0, show="*",
+                      bg="#dfdfdf",
+                      highlightthickness=0)
 
-    # Alert when validation not successfully
-    alert_lbl = Label(frame, text="", foreground='red')
-    alert_lbl.pack()
+    entryPass.place(
+        x=620, y=319,
+        width=255.0,
+        height=43)
 
-    # Sign Up button
-    Button(frame, text="Sign Up",
-           command=lambda: changeFrameFromSignupToSearch(client_gui, entry_username.get(), entry_password.get(), entry_pass_conf.get(), alert_lbl)).pack()
-    Button(frame, text="Da co tai khoan",
-           command=lambda: changeFrameFromSignupToLogin(client_gui)).pack()
+    # Notice
+    LabelLogin = Label(text="", background="red")
+    LabelLogin.place(x=600, y=373, width=300, height=25)
+    # login Button
+    canvas.btnLogin_img = PhotoImage(file=f"LogSignImg/login0.png")
+    btnLogin = Button(frame, bd=0, bg="white", image=canvas.btnLogin_img,
+                      command=lambda: switchFrame(app, SearchPage))
+
+    btnLogin.place(
+        x=690, y=407, anchor=NW,
+        width=120,
+        height=50)
+    # Sign Up Button
+    canvas.btnSignUp_img = PhotoImage(file=f"LogSignImg/signup1.png")
+    btnSignUp = Button(frame, image=canvas.btnSignUp_img, bd=0,
+                       bg="white", command=lambda: switchFrame(app, SignUpPage))
+
+    btnSignUp.place(
+        x=806, y=466, anchor=NW,
+        width=110,
+        height=30)
     return frame
 
-# End GUI client
+
+def SearchPage(app):
+    frame = Frame(app)
+    canvas = Canvas(
+        frame,
+        bg="#99b1f6",
+        height=600,
+        width=1000,
+        bd=0,
+        highlightthickness=0,
+        relief="ridge")
+    canvas.place(x=0, y=0)
+
+    # Bachground
+    canvas.backgroundSearch_img = PhotoImage(
+        file=f"SearchPageImg/backgroundSearch.png")
+    canvas.create_image(
+        7, 23, anchor="nw",
+        image=canvas.backgroundSearch_img)
+
+    canvas.nameLabel_img = PhotoImage(file=f"SearchPageImg/img_nameLabel.png")
+    canvas.create_image(
+        26, 85, anchor='nw',
+        image=canvas.nameLabel_img)
+
+    nameLabel = Label(frame, text="Name", justify="center", font=",25",
+                      bd=0,
+                      bg="#ffffff",
+                      highlightthickness=0)
+
+    nameLabel.place(
+        x=45, y=86,
+        width=260.0,
+        height=38)
+    # Combobox Bank
+    canvas.comboboxBank_img = PhotoImage(
+        file=f"SearchPageImg/img_bankSearch.png")
+    canvas.create_image(
+        372, 85, anchor="nw",
+        image=canvas.comboboxBank_img)
+
+    comboboxBank = ttk.Combobox(frame, background="white", justify="center")
+    comboboxBank["value"] = ('Vietcombank', 'Vietinbank',
+                             'Techcombank', 'BIDV', 'Sacombank', 'SBV')
+    comboboxBank.current(0)
+    comboboxBank.place(
+        x=387, y=87,
+        width=140.0,
+        height=26)
+
+    # Combobox Currency
+
+    canvas.comboboxCurrency_img = PhotoImage(
+        file=f"SearchPageImg/img_currencySearch.png")
+    canvas.create_image(
+        597, 85, anchor="nw",
+        image=canvas.comboboxCurrency_img)
+
+    comboboxCurrency = ttk.Combobox(
+        frame, background="white", justify="center")
+    comboboxCurrency["value"] = (
+        'AUD', 'CAD', 'CHF', 'EUR', 'GBP', 'JPY', 'USD')
+    comboboxCurrency.current(6)
+
+    comboboxCurrency.place(
+        x=612, y=86,
+        width=70.0,
+        height=28)
+
+    # Result
+# entry3_img = PhotoImage(file = f"img_textBox3.png")
+# entry3_bg = canvas.create_image(
+#     285.0, 52.0,
+#     image = entry3_img)
+
+# entry3 = Entry(
+#     bd = 0,
+#     bg = "#ffffff",
+#     highlightthickness = 0)
+
+# entry3.place(
+#     x = -20, y = -153,
+#     width = 610,
+#     height = 408)
+
+    # SearchButton
+    canvas.searchButton_img = PhotoImage(
+        file=f"SearchPageImg/searchButton.png")
+    btnSearch = Button(frame,
+                       image=canvas.searchButton_img,
+                       background="#99b1f6",
+                       borderwidth=0,
+                       highlightthickness=0,
+                       relief="flat")
+
+    btnSearch.place(
+        x=766, y=85,
+        width=100,
+        height=30)
+    # Reset Button
+    canvas.btnRS_img = PhotoImage(file=f"SearchPageImg/resetButton.png")
+    btnRS = Button(
+        image=canvas.btnRS_img,
+        background="#99b1f6",
+        borderwidth=0,
+        highlightthickness=0,
+        relief="flat")
+
+    btnRS.place(
+        x=878, y=85,
+        width=100,
+        height=30)
+    # Back button
+    canvas.backButton_img = PhotoImage(file=f"SearchPageImg/backButton.png")
+    btnBack = Button(
+        image=canvas.backButton_img,
+        background="#99b1f6",
+        borderwidth=0,
+        highlightthickness=0,
+        command=lambda: switchFrame(app, LoginPage),
+        relief="flat")
+
+    btnBack.place(
+        x=872, y=17,
+        width=106,
+        height=45)
+    return frame
+
+
+def switchFrame(app, nextFrame):
+    newFrame = nextFrame(app)
+    if app.currentFrame is not None:
+        app.currentFrame.destroy()
+    app.currentFrame = newFrame
+    app.currentFrame.pack(fill="both", expand=True)
+
+
+# Init window
+# app = Tk()
+# app.title("Currency App")
+# app.geometry("1000x600")
+# app.configure(bg="white")
+# app.resizable(width=False, height=False)
+# app.currentFrame = None
+# switchFrame(app, LoginPage)
+# app.mainloop()

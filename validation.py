@@ -54,9 +54,3 @@ def validateResquest(bank, currency_type):
     if currency_type not in ['AUD', 'CAD', 'CHF', 'EUR', 'GBP', 'JPY', 'USD']:
         return False
     return True
-
-
-def validateStartUp(ip, port):
-    if(ip == HOST and port == PORT):
-        return True
-    return False

@@ -5,6 +5,14 @@ import requestAPI as res
 from threading import Thread
 
 
+def sendList(conn, list):
+    for item in list:
+        conn.sendall(str(item).encode(FORMAT))
+        conn.recv(BUFFSIZE).decode(FORMAT)
+
+    conn.sendall(END_MSG.encode(FORMAT))
+
+
 def receiveList(conn):
     list = []
 
@@ -59,21 +67,17 @@ def receiveLoginAccount(conn):
     return account
 
 
-def receiveRequest(conn):
-    request = receiveList(conn)
-
-    return request
-
-
 def handleRequestServer(conn):
     request = receiveList(conn)
-    response = str(res.getCurrency(request[0], request[1]))
-    conn.sendall(response.encode(FORMAT))
+    response = res.getCurrency(request[0], request[1])
 
+    size = str(len(response))
+    conn.sendall(size.encode(FORMAT))
+    conn.recv(BUFFSIZE).decode(FORMAT)
 
-def sendResponse(conn, request):
-    response = str(res.getCurrency(request[0], request[1]))
-    conn.sendall(response.encode(FORMAT))
+    for item in response:
+        sendList(conn, item)
+        conn.recv(BUFFSIZE).decode(FORMAT)
 
 
 def receiveMessage(conn, addr):
@@ -98,11 +102,6 @@ def receiveMessage(conn, addr):
         if msg == LOGIN:
             account = receiveLoginAccount(conn)
             print('Log In Account: ', account)
-            continue
-
-        if msg == 'list':
-            list = receiveAccount(conn)
-            print('List: ', list)
             continue
 
         if msg == REQUEST:
