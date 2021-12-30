@@ -3,7 +3,6 @@ from constant import *
 from tkinter.ttk import *
 from tkinter import *
 from validation import *
-from gui import *
 
 # Start handle data client
 
@@ -95,14 +94,8 @@ def changeFrameFromStartToSignup(app, SignUpPage, ip,  port, alert_lbl):
 #     client.sendall(CLOSE.encode(FORMAT))
 #     switchFrame(app, LoginPage)
 def deleteOldResult(entry_result):
-    size_del = entry_result[0].size()
-    for i in range(len(entry_result)):
-        entry_result[i].delete(0, size_del)
-
-
-def outputResult(entry_result, result, index):
-    for i in range(3):
-        entry_result[i].insert(index, result[i])
+    for item in entry_result.get_children():
+        entry_result.delete(item)
 
 
 def handleRequestClient(entry_result, bank, currency_type):
@@ -118,7 +111,7 @@ def handleRequestClient(entry_result, bank, currency_type):
 
     for i in range(0, size):
         result = receiveList()
-        outputResult(entry_result, result, i)
+        entry_result.insert('', END, values=result)
         client.sendall(EMPTY_MSG.encode(FORMAT))
 
 
@@ -475,7 +468,7 @@ app.geometry("1000x600")
 app.configure(bg="white")
 app.resizable(width=False, height=False)
 app.currentFrame = None
-switchFrame(app, SearchPage)
+switchFrame(app, ConnectPage)
 
 
 app.protocol("WM_DELETE_WINDOW", onClosing)
