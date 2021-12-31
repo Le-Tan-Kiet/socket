@@ -133,6 +133,7 @@ def ConnectPage(app):
         image=canvas.entryIP_img)
     entryIP = Entry(frame,
                     bd=0,
+                    font=("", 12),
                     bg="#dfdfdf",
                     highlightthickness=0)
     entryIP.place(
@@ -146,6 +147,7 @@ def ConnectPage(app):
         image=canvas.entryPort_img)
     entryPort = Entry(frame,
                       bd=0,
+                      font=("", 12),
                       bg="#dfdfdf",
                       highlightthickness=0)
     entryPort.place(
@@ -154,7 +156,8 @@ def ConnectPage(app):
         height=43)
 
     # Notice
-    LabelIP = Label(frame,  text="", background="#fff", fg="red")
+    LabelIP = Label(frame,  text="", background="#fff",
+                    font=("", 12), fg="red")
     LabelIP.place(x=600, y=335, width=300, height=25)
 
     # Connect Button
@@ -192,6 +195,7 @@ def SignUpPage(app):
         image=canvas.entrySigUpUser_img)
     entrySignUpUser = Entry(frame,
                             bd=0,
+                            font=("", 12),
                             bg="#dfdfdf",
                             highlightthickness=0)
 
@@ -206,6 +210,7 @@ def SignUpPage(app):
 
     entrySignUpPass = Entry(frame,
                             bd=0, show="*",
+                            font=("", 14),
                             bg="#dfdfdf",
                             highlightthickness=0)
 
@@ -222,6 +227,7 @@ def SignUpPage(app):
 
     entryCFSignUPPass = Entry(frame,
                               bd=0, show="*",
+                              font=("", 14),
                               bg="#dfdfdf",
                               highlightthickness=0)
 
@@ -230,7 +236,8 @@ def SignUpPage(app):
         width=255.0,
         height=43)
     # Notice
-    LabelSignUp = Label(frame,  text="", background="#fff", fg="red")
+    LabelSignUp = Label(frame,  text="", background="#fff",
+                        font=("", 12), fg="red")
     LabelSignUp.place(x=600, y=141, width=300, height=25)
 
     # Sign Up Button
@@ -269,6 +276,7 @@ def LoginPage(app):
 
     entryUser = Entry(frame,
                       bd=0,
+                      font=("", 12),
                       bg="#dfdfdf",
                       highlightthickness=0)
 
@@ -282,6 +290,7 @@ def LoginPage(app):
 
     entryPass = Entry(frame,
                       bd=0, show="*",
+                      font=("", 14),
                       bg="#dfdfdf",
                       highlightthickness=0)
 
@@ -291,7 +300,8 @@ def LoginPage(app):
         height=43)
 
     # Notice
-    LabelLogin = Label(text="", background="#fff", fg="red")
+    LabelLogin = Label(text="", background="#fff",
+                       font=("", 12), fg="red")
     LabelLogin.place(x=600, y=373, width=300, height=25)
     # login Button
     canvas.btnLogin_img = PhotoImage(file=f"LogSignImg/login0.png")
@@ -427,17 +437,25 @@ def SearchPage(app):
         height=45)
 
     # Result
-    columns = ('bank', 'currency', 'sell')
+    columns = ('bank', 'currency', 'buy_cash', 'buy_transfer', 'sell')
     result = Treeview(frame, columns=columns, show='headings')
+    result.column('bank', width=118)
+    result.column('currency', width=118)
+    result.column('buy_cash', width=118)
+    result.column('buy_transfer', width=118)
+    result.column('sell', width=118)
 
     result.heading('bank', text='Bank')
     result.heading('currency', text='Currency')
+    result.heading('buy_cash', text='Buy Cash')
+    result.heading('buy_transfer', text='Buy Transfer')
     result.heading('sell', text='Sell')
 
     result.place(x=380, y=140, width=590, height=410)
 
     # DateTime
-    Label(frame, text=f'Date Time Update: {DATETIME}', bg="#fff").place(
+    Label(frame, text=f'Date Time Update: {DATETIME}',
+          font=("", 14), bg="#fff").place(
         x=400, y=550, width=500, height=35)
 
     return frame

@@ -53,12 +53,17 @@ def updateData():
 
 
 def getCurrencyBank(bank, type_currency):
-    list = []
+    list = ["0", "0", "0", "0", "0"]
     for item in data[bank]:
         if item["currency"] == type_currency:
-            list.append(bank)
-            list.append(item["currency"])
-            list.append(item["sell"])
+            list[0] = bank
+            list[1] = item["currency"]
+            list[4] = item["sell"]
+            for i in item:
+                if list[2] == "0" and (i == "buy" or i == "buy_cash"):
+                    list[2] = str(item[i])
+                if list[3] == "0" and i == "buy_transfer":
+                    list[3] = str(item[i])
     return list
 
 
