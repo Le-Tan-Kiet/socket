@@ -2,7 +2,7 @@ import requests
 import json
 from constant import *
 from threading import Timer
-import datetime
+from datetime import datetime
 
 data = {}
 
@@ -23,7 +23,7 @@ def getBankId(bank):  # Get bank name by bank ID
 
 
 def getBankData(bank, token):  # Get bank data by bank
-    # Resquest to get currency transform
+    # Resquest to get currency
     api_url = 'https://vapi.vnappmob.com/api/v2/exchange_rate/%s'
     api_url_bank = api_url % (str(getBankId(bank)))
     response = requests.get(
@@ -38,7 +38,7 @@ def getData():
         'https://vapi.vnappmob.com/api/request_api_key?scope=exchange_rate&fbclid=IwAR1LiVpNea58gxXeGZgPX6QWRRJQpkFfS_r41PJRsuy2z7-1uurKflwhGWo')
     token = json.loads(api_key.content)["results"]
 
-    for item in bank_list:
+    for item in BANK_LIST:
         data[item] = getBankData(item, token)
 
     return data
@@ -48,7 +48,7 @@ def updateData():
     global data
     data = getData()
     global DATETIME
-    DATETIME = str(datetime.datetime.now())
+    DATETIME = str(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
     Timer(1800, updateData).start()
 
 
@@ -71,16 +71,16 @@ def getCurrency(bank, type_currency):  # Get sell currency
     # Find currency
     list = []
     if bank == "All" and type_currency == "All":
-        for i in bank_list:
-            for j in type_currency_list:
+        for i in BANK_LIST:
+            for j in TYPE_CURRENCY_LIST:
                 list_item = getCurrencyBank(i, j)
                 list.append(list_item)
     elif bank == "All":
-        for i in bank_list:
+        for i in BANK_LIST:
             list_item = getCurrencyBank(i, type_currency)
             list.append(list_item)
     elif type_currency == "All":
-        for j in type_currency_list:
+        for j in TYPE_CURRENCY_LIST:
             list_item = getCurrencyBank(bank, j)
             list.append(list_item)
     else:

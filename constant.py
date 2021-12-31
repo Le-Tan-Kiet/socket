@@ -20,6 +20,6 @@ NAMEUSER = ""
 DATETIME = str(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
 
 
-bank_list = ['Vietcombank', 'Vietinbank',
+BANK_LIST = ['Vietcombank', 'Vietinbank',
              'Techcombank', 'BIDV', 'Sacombank', 'SBV']
-type_currency_list = ['AUD', 'CAD', 'CHF', 'EUR', 'GBP', 'JPY', 'USD']
+TYPE_CURRENCY_LIST = ['AUD', 'CAD', 'CHF', 'EUR', 'GBP', 'JPY', 'USD']

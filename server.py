@@ -44,14 +44,6 @@ def handleRequestServer(conn, addr):
 
 
 def closeAllConnect():
-    # for c in clients:
-    #     # try:
-    #     #     c[0].sendall(CLOSE.encode(FORMAT))
-    #     # except:
-    #     #     pass
-    #     c[0].close()
-    # conx.close()
-
     app.destroy()
     s.close()
     os._exit(1)
@@ -254,15 +246,14 @@ def createServer(app):
         app.currentFrame.actiList.insert(END, f'Server: {HOST} {PORT}')
         app.currentFrame.actiList.insert(END, 'Waiting for client.........')
 
-        # Update data
-        res.updateData()
-
         thr = Thread(target=connectToCli)
         thr.daemon = True
         thr.start()
+    # Update data
+    res.updateData()
 
 
-# Conncect To Client
+# Connect To Client
 def connectToCli():
     while True:
         try:
@@ -315,7 +306,7 @@ def serverSignUp(conn: socket, addr, cursor, conx):
                        (clientUsername, clientPassword))
         msg = SUCCESS
         app.currentFrame.actiList.insert(
-            END, f'{clientUsername}, sign up succesfully!')
+            END, f'{clientUsername}, sign up successfully!')
     else:
         app.currentFrame.actiList.insert(
             END, f'{clientUsername}, sign up fail!')
@@ -341,7 +332,7 @@ def handleClient(conn: socket, addr):
             "INSERT INTO loginInfo (username,password) values ('admin','1')")
         app.currentFrame.actiList.insert(END, 'Database is created!')
     else:
-        app.currentFrame.actiList.insert(END, 'Databse: Connected !')
+        app.currentFrame.actiList.insert(END, 'Database: Connected !')
     # Commit the changes db
     conx.commit()
 
@@ -366,7 +357,7 @@ def handleClient(conn: socket, addr):
 
     clients.remove((conn, addr))
     updateCliList()
-    app.currentFrame.actiList.insert(END, f'Client {addr} finised')
+    app.currentFrame.actiList.insert(END, f'Client {addr} finished')
     # Login Server
 
 

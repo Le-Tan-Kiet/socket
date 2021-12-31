@@ -35,10 +35,9 @@ def changeFrameFromSignupToSearch(app, SearchPage,  username, password, pass_con
     list = [username, password, pass_conf]
     sendList(list)
 
-    # Input username
     is_valid_account = client.recv(BUFFSIZE).decode(FORMAT)
     if is_valid_account == FAIL:
-        alert_lbl.configure(text='Sign up fail')
+        alert_lbl.configure(text='Sign up fail! Please sign up again.')
         return
 
     global NAMEUSER
@@ -57,7 +56,7 @@ def changeFrameFromLoginToSearch(app, SearchPage,  username, password, alert_lbl
 
     is_valid_account = client.recv(BUFFSIZE).decode(FORMAT)
     if is_valid_account == FAIL:
-        alert_lbl.configure(text='Tai khoan khong hop le')
+        alert_lbl.configure(text='Login fail! Please login again.')
         return
 
     global NAMEUSER
@@ -66,17 +65,14 @@ def changeFrameFromLoginToSearch(app, SearchPage,  username, password, alert_lbl
 
 
 def changeFrameFromStartToSignup(app, SignUpPage, ip,  port, alert_lbl):
-    alert_lbl.configure(text='Dang cho...')
     try:
         client.connect((ip, int(port)))
         switchFrame(app, SignUpPage)
     except:
-        alert_lbl.configure(text='IP hoac port khong dung')
+        alert_lbl.configure(
+            text='Connect to server fail! Please connect again.')
 
 
-# def changeFrameFromSearchToLogin(app, LoginPage):
-#     client.sendall(CLOSE.encode(FORMAT))
-#     switchFrame(app, LoginPage)
 def deleteOldResult(entry_result):
     for item in entry_result.get_children():
         entry_result.delete(item)
@@ -158,7 +154,7 @@ def ConnectPage(app):
     # Notice
     LabelIP = Label(frame,  text="", background="#fff",
                     font=("", 12), fg="red")
-    LabelIP.place(x=600, y=335, width=300, height=25)
+    LabelIP.place(x=590, y=335, width=310, height=25)
 
     # Connect Button
     canvas.btnConn_img = PhotoImage(file=f"LogSignImg/img_btnConn.png")
@@ -455,7 +451,7 @@ def SearchPage(app):
 
     # DateTime
     Label(frame, text=f'Date Time Update: {DATETIME}',
-          font=("", 14), bg="#fff").place(
+          font=("", 12), bg="#fff").place(
         x=400, y=550, width=500, height=35)
 
     return frame
