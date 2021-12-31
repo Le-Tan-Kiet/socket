@@ -376,7 +376,7 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 clients = set()
 # Init window
 app = Tk()
-app.title("Currency App")
+app.title("Currency App Server")
 app.geometry("1000x600")
 app.configure(bg="white")
 app.resizable(width=False, height=False)
