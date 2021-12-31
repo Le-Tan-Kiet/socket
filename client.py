@@ -4,8 +4,6 @@ from tkinter.ttk import *
 from tkinter import *
 from validation import *
 
-# Start handle data client
-
 
 def sendList(list):
     for item in list:
@@ -27,12 +25,6 @@ def receiveList():
     return list
 
 
-def receiveResponse():
-    response = client.recv(BUFFSIZE).decode(FORMAT)
-    return response
-
-# End handle data client
-
 # Start GUI
 
 
@@ -42,24 +34,10 @@ def changeFrameFromSignupToSearch(app, SearchPage,  username, password, pass_con
     sendList(list)
 
     # Input username
-    is_valid_username = client.recv(BUFFSIZE).decode(FORMAT)
-    if(is_valid_username == FAIL):
-        alert_lbl.configure(text='Ten tai khoan khong hop le')
+    is_valid_account = client.recv(BUFFSIZE).decode(FORMAT)
+    if is_valid_account == FAIL:
+        alert_lbl.configure(text='Sign up fail')
         return
-    client.sendall(EMPTY_MSG.encode(FORMAT))
-    # Input password
-
-    is_valid_password = client.recv(BUFFSIZE).decode(FORMAT)
-    if(is_valid_password == FAIL):
-        alert_lbl.configure(text='Mat khau phai co it nhat 6 ki tu')
-        return
-    client.sendall(EMPTY_MSG.encode(FORMAT))
-    # Input confirm password
-    is_valid_pass_conf = client.recv(BUFFSIZE).decode(FORMAT)
-    if(is_valid_pass_conf == FAIL):
-        alert_lbl.configure(text='Mat khau khong khop')
-        return
-    client.sendall(EMPTY_MSG.encode(FORMAT))
 
     global NAMEUSER
     NAMEUSER = username
@@ -68,6 +46,7 @@ def changeFrameFromSignupToSearch(app, SearchPage,  username, password, pass_con
 
 def changeFrameFromLoginToSearch(app, SearchPage,  username, password, alert_lbl):
     client.sendall(LOGIN.encode(FORMAT))
+    client.recv(BUFFSIZE).decode(FORMAT)
     account = [username, password]
     sendList(account)
 
@@ -469,7 +448,6 @@ app.configure(bg="white")
 app.resizable(width=False, height=False)
 app.currentFrame = None
 switchFrame(app, ConnectPage)
-
 
 app.protocol("WM_DELETE_WINDOW", onClosing)
 

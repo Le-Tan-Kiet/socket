@@ -45,6 +45,7 @@ def getData():
 
 
 def updateData():
+    global data
     data = getData()
     global DATETIME
     DATETIME = str(datetime.datetime.now())
