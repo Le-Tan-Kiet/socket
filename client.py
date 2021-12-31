@@ -2,7 +2,6 @@ import socket
 from constant import *
 from tkinter.ttk import *
 from tkinter import *
-from validation import *
 
 
 def sendList(list):

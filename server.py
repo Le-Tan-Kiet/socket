@@ -1,8 +1,6 @@
 import socket
 import sqlite3
-import pyodbc
 from constant import *
-from validation import *
 import requestAPI as res
 from threading import Thread
 from tkinter.ttk import *
@@ -267,11 +265,12 @@ def connectToCli():
 
             clients.add((conn, addr))
             thr = Thread(target=handleClient, args=(conn, addr))
-            thr.daemon = False  # TRUE = Close thred whenever end main code
+            thr.daemon = True  # TRUE = Close thred whenever end main code
             thr.start()
 
         except:
             print('Error')
+            break
 
     s.close()
     # Handle Client

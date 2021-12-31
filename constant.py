@@ -15,8 +15,6 @@ FAIL = 'fail'
 END_MSG = 'end'
 EMPTY_MSG = 'empty'
 
-ISEMPTYDATA = True
-
 NAMEUSER = ""
 DATETIME = ""
 
