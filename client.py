@@ -28,7 +28,10 @@ def receiveList():
 
 
 def changeFrameFromSignupToSearch(app, SearchPage,  username, password, pass_conf, alert_lbl):
-    client.sendall(SIGNUP.encode(FORMAT))
+    try:
+        client.sendall(SIGNUP.encode(FORMAT))
+    except:
+        onClosing()
     list = [username, password, pass_conf]
     sendList(list)
 
@@ -44,7 +47,10 @@ def changeFrameFromSignupToSearch(app, SearchPage,  username, password, pass_con
 
 
 def changeFrameFromLoginToSearch(app, SearchPage,  username, password, alert_lbl):
-    client.sendall(LOGIN.encode(FORMAT))
+    try:
+        client.sendall(LOGIN.encode(FORMAT))
+    except:
+        onClosing()
     client.recv(BUFFSIZE).decode(FORMAT)
     account = [username, password]
     sendList(account)
@@ -78,8 +84,10 @@ def deleteOldResult(entry_result):
 
 def handleRequestClient(entry_result, bank, currency_type):
     deleteOldResult(entry_result)
-
-    client.sendall(REQUEST.encode(FORMAT))
+    try:
+        client.sendall(REQUEST.encode(FORMAT))
+    except:
+        onClosing()
     request = [bank, currency_type]
     sendList(request)
 
@@ -373,16 +381,6 @@ def SearchPage(app):
         width=70.0,
         height=28)
 
-    # Result
-    columns = ('bank', 'currency', 'sell')
-    result = Treeview(frame, columns=columns, show='headings')
-
-    result.heading('bank', text='Bank')
-    result.heading('currency', text='Currency')
-    result.heading('sell', text='Sell')
-
-    result.place(x=380, y=140, width=590, height=420)
-
     # SearchButton
     canvas.searchButton_img = PhotoImage(
         file=f"SearchPageImg/searchButton.png")
@@ -400,6 +398,7 @@ def SearchPage(app):
     # Reset Button
     canvas.btnRS_img = PhotoImage(file=f"SearchPageImg/resetButton.png")
     btnRS = Button(
+        frame,
         image=canvas.btnRS_img,
         background="#99b1f6",
         borderwidth=0,
@@ -411,20 +410,36 @@ def SearchPage(app):
         x=878, y=85,
         width=100,
         height=30)
-    # Back button
-    canvas.backButton_img = PhotoImage(file=f"SearchPageImg/backButton.png")
-    btnBack = Button(
-        image=canvas.backButton_img,
+    # Quit button
+    canvas.quitButton_img = PhotoImage(file=f"SearchPageImg/quit0.png")
+    btnQuit = Button(
+        frame,
+        image=canvas.quitButton_img,
         background="#99b1f6",
         borderwidth=0,
         highlightthickness=0,
-        command=onClosing,
-        relief="flat")
+        command=onClosing,)
 
-    btnBack.place(
+    btnQuit.place(
         x=872, y=17,
+        anchor=NW,
         width=106,
         height=45)
+
+    # Result
+    columns = ('bank', 'currency', 'sell')
+    result = Treeview(frame, columns=columns, show='headings')
+
+    result.heading('bank', text='Bank')
+    result.heading('currency', text='Currency')
+    result.heading('sell', text='Sell')
+
+    result.place(x=380, y=140, width=590, height=410)
+
+    # DateTime
+    Label(frame, text=f'Date Time Update: {DATETIME}', bg="#fff").place(
+        x=400, y=550, width=500, height=35)
+
     return frame
 
 

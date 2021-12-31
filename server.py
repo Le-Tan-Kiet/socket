@@ -5,6 +5,7 @@ import requestAPI as res
 from threading import Thread
 from tkinter.ttk import *
 from tkinter import *
+import os
 
 
 def sendList(conn, list):
@@ -27,13 +28,15 @@ def receiveList(conn):
     return list
 
 
-def handleRequestServer(conn):
+def handleRequestServer(conn, addr):
     request = receiveList(conn)
     response = res.getCurrency(request[0], request[1])
 
     size = str(len(response))
     conn.sendall(size.encode(FORMAT))
     conn.recv(BUFFSIZE).decode(FORMAT)
+    app.currentFrame.actiList.insert(
+        END, f'Client: {addr} request ({request[0]},{request[1]})')
 
     for item in response:
         sendList(conn, item)
@@ -41,15 +44,17 @@ def handleRequestServer(conn):
 
 
 def closeAllConnect():
-    for c in clients:
-        # try:
-        #     c[0].sendall(CLOSE.encode(FORMAT))
-        # except:
-        #     pass
-        c[0].close()
+    # for c in clients:
+    #     # try:
+    #     #     c[0].sendall(CLOSE.encode(FORMAT))
+    #     # except:
+    #     #     pass
+    #     c[0].close()
     # conx.close()
+
     app.destroy()
     s.close()
+    os._exit(1)
 
 
 def updateCliList():
@@ -105,9 +110,9 @@ def StartServer(app):
                             highlightthickness=0)
 
     frame.entryPort.place(
-        x=280, y=28, anchor='nw',
-        width=40.0,
-        height=38)
+        x=275, y=30, anchor='nw',
+        width=50.0,
+        height=35)
     # Activity List
     actiList_img = PhotoImage(file=f"ServerImg/img_textBox1.png")
     canvas.create_image(
@@ -265,14 +270,11 @@ def connectToCli():
 
             clients.add((conn, addr))
             thr = Thread(target=handleClient, args=(conn, addr))
-            thr.daemon = True  # TRUE = Close thred whenever end main code
+            thr.daemon = True  # TRUE = Close thread whenever end main code
             thr.start()
 
         except:
-            print('Error')
             break
-
-    s.close()
     # Handle Client
 
 
@@ -324,7 +326,7 @@ def serverSignUp(conn: socket, addr, cursor, conx):
 
 def handleClient(conn: socket, addr):
     app.currentFrame.cliList.insert(END, addr)
-    app.currentFrame.actiList.insert(END, f'Client_Address: {addr} connected')
+    app.currentFrame.actiList.insert(END, f'Client: {addr} connected')
     msg = None
     # Connect Database
     conx = sqlite3.connect('database.db')
@@ -355,7 +357,7 @@ def handleClient(conn: socket, addr):
             serverLogin(conn, addr, cursor)
             continue
         if(msg == REQUEST):
-            handleRequestServer(conn)
+            handleRequestServer(conn, addr)
             continue
         if(msg == CLOSE):
             conn.close()

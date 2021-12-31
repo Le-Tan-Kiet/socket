@@ -1,3 +1,4 @@
+import datetime
 
 HOST = '127.0.0.1'
 PORT = 55555
@@ -16,7 +17,7 @@ END_MSG = 'end'
 EMPTY_MSG = 'empty'
 
 NAMEUSER = ""
-DATETIME = ""
+DATETIME = str(datetime.datetime.now())
 
 
 bank_list = ['Vietcombank', 'Vietinbank',
